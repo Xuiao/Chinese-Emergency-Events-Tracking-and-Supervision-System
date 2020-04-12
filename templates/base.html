@@ -1,0 +1,100 @@
+{% load staticfiles %}
+
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'base.css' %}">
+     <!-- 引入bootstrap的css文件 -->
+     <!-- 引入bootstrap的css文件 -->
+    <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.min.css' %}">
+    <!--<link rel="stylesheet" href="{% static 'bootstrap-3.3.7/css/bootstrap.min.css' %}">-->
+    <script type="text/javascript" src="{% static 'jquery-1.12.4.min.js' %}"></script>
+    <!--<script type="text/javascript" src="{% static 'bootstrap-3.3.7/js/bootstrap.min.js' %}"></script>-->
+     <!--矢量图标-->
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css"
+      integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf"
+      crossorigin="anonymous">
+
+
+   <!-- 引入monikai.css 高亮样式文件 -->
+    <link rel="stylesheet" href="{% static 'markdown_css/monokai.css' %}">
+    <!--引入Font Awesome 图标字体库和CSS框架 -->
+    <link href="//netdna.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+  <!-- The default timeline stylesheet -->
+   <link rel="stylesheet" href="{% static 'assets/css/time_line.css' %}" />
+    {% block header_extends %}{% endblock %}
+
+</head>
+<body>
+ <!-- 引入导航栏 -->
+{% include 'header.html' %}
+
+<!-- 预留具体页面的位置 -->
+<div id="wrapper">
+    {% block content %}{% endblock content %}
+    <div id="push"></div>
+</div>
+
+<!-- 引入注脚 -->
+{% include 'footer.html' %}
+
+{% block script_extends %}{% endblock %}
+</body>
+<div id="particles-js"></div>
+<div id="result"></div>
+
+
+<script>
+    $("#id_keyword").bind('input propertychange', function() {
+      var keyword = $(this).val();
+
+      $.ajax({
+        url: '/blog/ajax/search/',
+        data: {
+          'keyword': keyword
+        },
+        type: 'GET',
+        dataType: 'json',
+        success: function (data) {
+        $("#result").html("<p>正在实时查询...共" + data.count + "条记录</p>")
+        },
+
+      });
+    });
+  </script>
+
+ <!-- bootstrap.js 依赖 jquery.js 和popper.js，因此在这里引入 -->
+    <script src="{% static 'jquery/jquery-3.3.1.js' %}"></script>
+    <script src="{% static 'popper/popper-1.14.4.js' %}"></script>
+    <!-- 引入bootstrap的js文件 -->
+    <script src="{% static 'bootstrap/js/bootstrap.min.js' %}"></script>
+    <!-- 引入layer.js Layer弹窗组件依赖jquery才能正常工作，因此要在jquery的后面引入layer。 -->
+    <script src="{% static 'layer/layer.js' %}"></script>
+
+    {% include 'back_to_top.html' %}
+
+
+
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+        }
+
+        #wrapper {
+            min-height: 100%;
+            margin-bottom: -40px;
+        }
+
+        #footer,
+        #push {
+            height: 60px;
+        }
+    </style>
+</html>
+
+
+

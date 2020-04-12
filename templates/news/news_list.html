@@ -1,0 +1,115 @@
+{% extends 'base.html' %}
+{% block title %}中国突发事件跟踪与监管系统小站 | 新闻列表 {% endblock %}
+{% block nav_blog_active %}active{% endblock %}
+
+{% load staticfiles %}
+{% load comment_tags %}
+{% load likes_tags %}
+
+{% block header_extends %}
+<link rel="stylesheet" href="{% static 'crawler/news.css' %}">
+{% endblock %}
+
+{# 页面内容 #}
+{% block content %}
+    <div class="container" style="margin-top:80px">
+        <div class="row">
+            <div class="col-xs-12 col-sm-8 col-md-9 col-lg-10">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <p>突发事件新闻列表  |
+                        共有{{ page_of_news.paginator.count }}篇新闻，
+                        当前第{{ page_of_news.number }}页，共{{ page_of_news.paginator.num_pages }}页
+                    </p>
+                    </div>
+                    <div class="panel-body">
+                        {% for item in all_news %}
+                            <div class="blog">
+                                <h3><a href="{% url 'news_detail' item.pk %}">
+                                    <span><i class="fas fa-book" style="color: grey;"></i></span>
+                                        标题 : {{ item.title }}
+                                    </a>
+                                </h3>
+                                <p>
+                                    <span><i class="fas fa-user" style="color: green;"></i></span>{{ forLoop.counter}} </ba>
+                                </p>
+                                <p class="blog-info">
+                                    <span><i class="fas fa-tag" style="color: black;"></i></span> <a href="#">{{ item.category }}</a>&nbsp;&nbsp;
+                                    <span><i class="fas fa-clock" style="color: green;"> {{ item.time|date:"Y-m-d" }}</i></span>
+                                    <span><i class="fas fa-eye" style="color: blue;"> ({{ item.get_read_num }})</i></span>&nbsp
+                                    <span><i class="fas fa-comment" style="color: violet;"> ({% get_comment_count item %})</i></span>&nbsp
+                                    <span> <i class="fas fa-thumbs-up" style="color: red;">（{% get_like_count item %}）</i></span>&nbsp
+                                </p>
+                                <p>新闻详情：{{ item.content|striptags|truncatechars:500 }}</p>
+                            </div>
+                        {% empty %}
+                            <div class="blog">
+                                <h3>暂无新闻，小编正在发布中。。。</h3>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                <!-- 页码导航 -->
+                <div class="pagination row">
+                    <div class="m-auto">
+                        <span class="step-links">
+                            <!-- 如果不是第一页，则显示上翻按钮 -->
+                            {% if page_of_news.has_previous %}
+                                <a href="?page=1" class="btn btn-success">
+                                    &laquo; 1
+                                </a>
+                                <span>...</span>
+                                <a href="?page={{ page_of_news.previous_page_number }}" class="btn btn-secondary">
+                                    {{ page_of_news.previous_page_number }}
+                                </a>
+                                {% endif %}
+
+                                <!-- 当前页面 -->
+                                <span class="current btn btn-danger btn-lg">
+                                    {{ page_of_news.number }}
+                                </span>
+
+                            <!-- 如果不是最末页，则显示下翻按钮 -->
+                            {% if page_of_news.has_next  %}
+                                <a href="?page={{ page_of_news.next_page_number }}" class="btn btn-secondary">
+                                    {{ page_of_news.next_page_number }}
+                                </a>
+                                <span>...</span>
+                                <a href="?page={{ page_of_news.paginator.num_pages }}"
+                                   class="btn btn-success"
+                                >
+                                    {{ page_of_news.paginator.num_pages }} &raquo;
+                                </a>
+                            {% endif %}
+                        </span>
+                    </div>
+                </div>
+
+
+
+
+            </div>
+            <div class="hidden-xs col-sm-4 col-md-3 col-lg-2">
+
+                <div class="panel panel-default">
+                    <div class="panel-heading">日期归档</div>
+                    <div class="panel-body">
+                       <ul>
+                            {% for item_date, item_count in news_dates.items %}
+                                <li>
+                                    <a href="{% url 'news_with_date' item_date.year item_date.month %}">
+                                        {{ item_date|date:"Y年m月" }}
+                                    </a>                                    
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+{% endblock %}

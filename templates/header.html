@@ -1,0 +1,122 @@
+<!-- 载入静态文件 -->
+{% load staticfiles %}
+{% load notifications_tags %}
+{% notifications_unread as unread_count %}
+<!-- 定义导航栏 -->
+<nav class="navbar navbar-expand-sm navbar-dark bg-dark fixed-top">
+  <div class="container">
+    <!-- 导航栏商标 -->
+    <a class="navbar-brand" href="{% url 'home' %}">
+        <!--<i class="fas fa-news"></i> <img src="{% static 'image/logoo.png' %}" class="img-circle" height="45" width="50">China Emergency Tracking and Supervision System</a>-->
+         <i class="fas fa-blog"></i>  Emergency Tracking  </a>
+    <!-- 导航入口 -->
+    <div>
+      <ul class="navbar-nav">
+        <!-- 条目 -->
+        <li class="nav-item">
+          <!-- 改写了这里的 href -->
+            <a class="nav-link" href="{% url 'dashboard' %}"> <span><i class="fa fa-table "></i> Dashboard </span></a>
+        </li>
+
+        <li class="nav-item">
+          <!-- 改写了这里的 href -->
+            <a class="nav-link" href="{% url 'news_list' %}"> <span><i class="fa fa-book "></i> News </span></a>
+        </li>
+
+        <li class="nav-item">
+        <!-- 改写了这里的 href -->
+            <a class="nav-link" href="{% url 'user_list' %}"><span><i class="fa fa-user"></i> user </span></a>
+        </li>
+
+        <!-- Django的 if 模板语句 -->
+      {% if user.is_authenticated %}
+          <!-- 如果用户已经登录，则显示用户名下拉框 -->
+          <li class="nav-item dropdown">
+               <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <!--{% if unread_count %}-->
+                                <svg viewBox="0 0 8 8" width="8px" height="8px">
+                                    <circle cx="4" cy="4" r="4" fill="#ff6b6b"></circle>
+                                </svg>
+                            <!--{% endif %}-->
+                            {{ user.username }}
+                        </a>
+              <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                <a class="dropdown-item" href="{% url 'user_info' %}"><i class="fa fa-user-circle" aria-hidden="true"></i> {{ user.username }} 的个人中心</a>
+                <a class="dropdown-item" href="{% url 'my_notifications' %}"><i class="fa fa-comment" aria-hidden="true"></i>
+                    站内通知
+                    {% if unread_count %}
+                    <span class="badge badge-danger">{{ unread_count }}</span>
+                    {% endif %}
+                </a>
+                {% if user.is_staff or user.is_superuser %}
+                <a class="dropdown-item" href="{% url 'admin:index' %}"><span><i class="fa fa-cog">后台管理</i></span></a>
+                {% endif %}
+                <a class="dropdown-item" href="{% url 'change_password' %}"><i class="fa fa-edit" aria-hidden="true"></i>修改密码</a>
+                <a class="dropdown-item" href="{% url 'logout' %}?from={{ request.get_full_path }}"><i class="fa fa-sign-out" aria-hidden="true"></i>退出登录</a>
+              </div>
+          </li>
+      <!-- 如果用户未登录，则显示 “登录” -->
+      {% else %}
+          <li class="nav-item">
+              <a class="nav-link" href="{% url 'login' %}?from={{ request.get_full_path }}">登录</a>
+          </li>
+      <!-- if 语句在这里结束 -->
+      {% endif %}
+         <!--<li class="nav-item">-->
+          <!--<a class="nav-link"  href="{% url 'register' %}?from={{ request.get_full_path }}">注册</a>-->
+        <!--</li>-->
+      </ul>
+    </div>
+
+  </div>
+</nav>
+
+<hr>
+<hr>
+<hr>
+
+<!-- Modal -->
+<div class="modal fade" id="login_modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <form id="login_medal_form" action="" method="POST">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">登录</h4>
+                </div>
+
+                <div class="modal-body">
+                    {% csrf_token %}
+                    {% for field in login_modal_form %}
+                        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                        {{ field }}
+                    {% endfor %}
+                    <span id="login_medal_tip" class="text-danger"></span>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">登录</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    $("#login_medal_form").submit(function(event){
+        event.preventDefault();
+        $.ajax({
+            url: '{% url "login_for_medal" %}',
+            type: 'POST',
+            data: $(this).serialize(),
+            cache: false,
+            success: function(data){
+                if(data['status']=='SUCCESS'){
+                    window.location.reload();
+                }else{
+                    $('#login_medal_tip').text('用户名或密码不正确');
+                }
+            }
+        });
+    });
+</script>

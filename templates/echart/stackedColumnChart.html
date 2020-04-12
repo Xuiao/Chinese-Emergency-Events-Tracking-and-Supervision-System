@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+
+{% block title %}
+    中国突发事件跟踪与监管系统
+{% endblock %}
+
+{% block header_extends %}
+
+
+<!--   <script src="static/echart/echarts.min.js"></script>-->
+  <script src="https://cdn.bootcss.com/echarts/4.1.0.rc2/echarts.min.js"></script>
+  <script type="text/javascript" src="http://echarts.baidu.com/gallery/vendors/echarts/map/js/china.js"></script>
+{% endblock %}
+
+{% block nav_home_active %}active{% endblock %}
+
+{% block content %}
+<!-- 定义放置文章标题的div容器 -->
+<div class="container">
+    <div class="row">
+        <div class="col-md-3">
+
+            <div class="list-group">
+              <a href="{% url 'dashboard' %}" class="list-group-item">
+                中国省份统计一览
+              </a>
+                <a href="{% url 'pieChart' %}" class="list-group-item">不同类型突发事件统计</a>
+                <a href="{% url 'stackedColumnChart' %}" class="list-group-item active ">一周每个类别每天的次数</a>
+                <a href="{% url 'histogramChart' %}" class="list-group-item">上个月突发事件次数</a>
+                <a href="{% url 'stackedColumnChartByYear' %}" class="list-group-item">每年突发事件次数</a>
+
+            </div>
+        </div>
+
+        <div class="col-md-9">
+          <div class="container">
+         <h3 class="home-content" align="center"> 堆叠柱状图展示2019年10月7号一周每个类别突发事件发生次数 </h3>
+
+          <div class="home-content" align="center">
+
+           <!-- 图表容器 DOM  堆叠柱状图展示每个类别对应每年的变化-->
+            <div id="stackedColumnChart" style="width: 800px;height:500px;"></div>
+
+          </div>
+    </div>
+        </div>
+    </div>
+</div>
+
+<script>
+ // 基于准备好的dom，初始化echarts实例 堆叠柱状图
+    var stackedColumnChart = echarts.init(document.getElementById('stackedColumnChart'));
+
+    var option = {
+     title: {
+            text: '上周突发事件发生次数统计'
+        },
+        tooltip : {
+            trigger: 'axis',
+            axisPointer : {            // 坐标轴指示器，坐标轴触发有效
+                type : 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
+            }
+        },
+        grid: {
+            left: '3%',
+            right: '4%',
+            bottom: '3%',
+            containLabel: true
+        },
+        xAxis : [
+            {
+                type : 'category',
+                data : ['周一','周二','周三','周四','周五','周六','周日']
+            }
+        ],
+        yAxis : [
+            {
+                type : 'value'
+            }
+        ],
+        series : [
+            {
+                name:'自然危害',
+                type:'bar',
+                stack: '广告',
+                data:[{{ nature_num_Monday }} , {{ nature_num_Tuesday }}, {{nature_num_Wednesday }}, {{nature_num_Thursday}}, {{ nature_num_Friday }}, {{ nature_num_Saturday}}, {{nature_num_Sunday }} ]
+
+            },
+            {
+                name:'社会安全',
+                type:'bar',
+                stack: '广告',
+                data:[{{socialSecurity_num_Monday }},{{socialSecurity_num_Tuesday }}, {{socialSecurity_num_Wednesday }}, {{socialSecurity_num_Thursday }}, {{socialSecurity_num_Friday }}, {{socialSecurity_num_Saturday }}, {{socialSecurity_num_Sunday }}]
+            },
+            {
+                name:'公共卫生',
+                type:'bar',
+                stack: '广告',
+                data:[{{publicHealth_num_Monday}},{{publicHealth_num_Tuesday }}, {{publicHealth_num_Wednesday }}, {{publicHealth_num_Thursday }}, {{publicHealth_num_Friday }}, {{publicHealth_num_Saturday }}, {{publicHealth_num_Sunday }}]
+            },
+            {
+                name:'事故灾难',
+                type:'bar',
+                stack: '广告',
+                data:[{{accident_num_Monday}},{{accident_num_Tuesday }}, {{accident_num_Wednesday }}, {{accident_num_Thursday }}, {{accident_num_Friday }}, {{accident_num_Saturday }}, {{accident_num_Sunday }}]
+            },
+
+
+        ]
+    };
+
+    // 使用刚指定的配置项和数据显示图表。
+    stackedColumnChart.setOption(option);
+
+
+
+</script>
+
+
+{% endblock %}

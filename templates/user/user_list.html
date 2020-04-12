@@ -1,0 +1,146 @@
+<!-- extends表明此页面继承自 base.html 文件 -->
+{% extends "base.html" %}
+{% load staticfiles %}
+
+<!-- 写入 base.html 中定义的 title -->
+{% block title %}
+    air博客网站 — logger
+{% endblock title %}
+
+{% load staticfiles %}
+{% load comment_tags %}
+{% load likes_tags %}
+
+<!-- 写入 base.html 中定义的 content -->
+{% block content %}
+
+<!-- 定义放置文章标题的div容器 -->
+<div class="container">
+
+        <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+           <li class="breadcrumb-item">
+                <a href="{% url 'user_list' %}">
+                   全部
+                </a>
+           </li>
+            <li class="breadcrumb-item">
+                <a href="{% url 'user_list' %}?search={{ search }}">
+                    最新推荐
+                </a>
+            </li>
+            <li class="breadcrumb-item">
+                <a href="{% url 'user_list' %}?order=total_views&search={{ search }}">
+                    热门推荐
+                </a>
+            </li>
+        </ol>
+    </nav>
+
+
+        <!-- 新增，搜索栏 -->
+    <div class="row">
+        <div class="col-auto mr-auto">
+            <form class="form-inline" >
+                <label class="sr-only">content</label>
+                <input type="text" class="form-control mb-6 mr-sm-6" name="search"
+                    placeholder="搜索用户..." required>
+                    <i class="fas fa-search"></i>
+            </form>
+        </div>
+    </div>
+
+    <!-- 新增，搜索提示语 -->
+    {% if search %}
+        {% if uper %}
+            <h4><span style="color: red">"{{ search }}"</span>的搜索结果如下：</h4>
+            <hr>
+        {% else %}
+            <h4>系统中没有<span style="color: green">"{{ search }}"</span>博主。</h4>
+            <hr>
+        {% endif %}
+    {% endif %}
+
+    <div class="row mt-2">
+
+        {% for item in uper %}
+        <!-- 内容 -->
+        <div class="col-4 mb-4">
+        <!-- 卡片容器 -->
+            <div class="card h-80">
+                <!-- 标题 -->
+                <h4 class="card-header">博主：{{ item.get_username }}</h4>
+                <!-- 视频描述 -->
+                <div class="card-body">
+                    <img src="/media/avatar/post-bg.jpg" alt="avatar"
+                         style="max-width:100%; border-radius: 20px" width="180" height="180"/>
+
+                    <p class="card-text">{{ item.get_bio|slice:'100' }}。。。</p>
+                       <span>
+                        <small class="col align-self-end">
+
+                            <i class="fas fa-clock" style="color: pink;"></i>
+                                    {{ item.last_login|date:"Y-m-d H:i:s" }} 登录
+                        </small>
+                    </span>
+
+                </div>
+                <!-- 注脚 -->
+                <div class="card-footer">
+                    <a href="{% url 'user_info' %}" class="btn btn-primary">了解更多</a>
+                       <!-- 显示浏览量 -->
+                    <span>
+                        <small class="col align-self-end">
+                            <i class="fas fa-eye" style="color: skyblue;">浏览:<span class="badge badge-pill"> {{ item.total_views }}</i></span>
+
+                        </small>
+                     </span>
+
+
+
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+
+    </div>
+</div>
+
+<!-- 页码导航 -->
+<div class="pagination row">
+    <div class="m-auto">
+        <span class="step-links">
+            <!-- 如果不是第一页，则显示上翻按钮 -->
+            {% if uper.has_previous %}
+               <a href="?page=1&order={{ order }}}&search={{ search }}" class="btn btn-success">&laquo; 1</a>
+                <span>...</span>
+                <a href="?page={{ uper.previous_page_number }}&order={{order}}}&search={{ search }};"
+                   class="btn btn-secondary">
+                    {{ uper.previous_page_number }}
+                </a>
+            {% endif %}
+
+            <!-- 当前页面 -->
+            <span class="current btn btn-info btn-lg">
+                {{ uper.number }}
+            </span>
+
+            <!-- 如果不是最末页，则显示下翻按钮 -->
+            {% if uper.has_next %}
+                <a href="?page={{ uper.next_page_number }}&order={{order}}}&search={{ search }}"
+                   class="btn btn-secondary">
+                    {{ uper.next_page_number }}
+                </a>
+                <span>...</span>
+                <a href="?page={{ uper.paginator.num_pages }}&order={{order}}}&search={{ search }}"
+                   class="btn btn-success">
+                    {{ uper.paginator.num_pages }} &raquo;
+                </a>
+            {% endif %}
+        </span>
+    </div>
+</div>
+
+{% endblock content %}
+
+

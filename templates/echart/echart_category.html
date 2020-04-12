@@ -1,0 +1,266 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+
+{% block title %}
+    中国突发事件跟踪与监管系统
+{% endblock %}
+
+{% block header_extends %}
+<!--    <link rel="stylesheet" href="{% static 'home.css' %}">-->
+
+    <script src="http://cdn.hcharts.cn/highcharts/highcharts.js"></script>
+    <script src="https://cdn.bootcss.com/echarts/4.1.0.rc2/echarts.min.js"></script>
+
+{% endblock %}
+
+{% block nav_home_active %}active{% endblock %}
+
+{% block content %}
+
+<!-- 定义放置文章标题的div容器 -->
+
+
+<div class="container">
+      <div class="home-content" align="center">
+    <!-- 图表容器 DOM -->
+        <div id="PieChart" class="margin:0 auto;border:1px solid #000;"></div>
+      </div>
+</div>
+
+
+<div class="container">
+    <h3 class="home-content" align="center"> 突发事件在中国发生的情况图表一览 </h3>
+    <div class="row">
+        <!-- 为ECharts准备一个具备大小（宽高）的Dom -->
+        <div id="main" align="center" class="margin:0 auto;border:1px solid #000;"></div>
+    </div>
+</div>
+
+<div class="container">
+    <h3 class="home-content" align="center"> 不同种类的突发事件统计图表一览 </h3>
+    <div class="row">
+        <!-- 为ECharts准备一个具备大小（宽高）的Dom -->
+        <div id="category" align="center" class="margin:0 auto;border:1px solid #000;"></div>
+    </div>
+</div>
+
+
+<div class="container">
+
+        <h2 class="home-content" align="center">中国突发事件跟踪与监管系统小站 </h2>
+         <br>
+
+    <div class="row">
+          <!-- 图表容器 DOM -->
+        <div id="container" class="col-md-9"></div>
+
+        <div class="col-md-3">
+            <h3>今日点击量排行榜</h3>
+            <ul>
+                {% for item in today_hot_data %}
+                    <li><a href="{% url 'news_detail' item.content_object.pk %}">{{ item.content_object.title }}</a>({{ item.read_num }})</li>
+                {% empty %}
+                    <li>暂无今今日点击量排行榜</li>
+                {% endfor %}
+            </ul>
+        </div>
+
+    </div>
+
+    <div class="row">
+          <!-- 图表容器 DOM -->
+        <div id="container_accident" class="col-md-9"></div>
+        <div class="col-md-3">
+            <h3>本周点击量排行榜</h3>
+            <ul>
+                {% for item in today_hot_data %}
+                    <li><a href="{% url 'blog_detail' item.content_object.pk %}">{{ item.content_object.title }}</a>({{ item.read_num }})</li>
+                {% empty %}
+                    <li>暂无本周点击量排行榜</li>
+                {% endfor %}
+            </ul>
+    </div>
+
+    </div>
+
+    <div class="row">
+          <!-- 图表容器 DOM -->
+        <div id="container_publicHealth" class="col-md-9"></div>
+        <div class="col-md-3">
+            <h3>上周点击量排行榜</h3>
+            <ul>
+                {% for item in today_hot_data %}
+                    <li><a href="{% url 'blog_detail' item.content_object.pk %}">{{ item.content_object.title }}</a>({{ item.read_num }})</li>
+                {% empty %}
+                    <li>上周点击量排行榜 正在统计中..</li>
+                {% endfor %}
+            </ul>
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+    var pieChart = echarts.init(document.getElementById('PieChart'));
+
+    // 图表配置
+    var options = {
+        chart: { type: 'line' }, //指定图表的类型，默认是折线图（line）
+        title: { text: '上周突发事件新闻浏览概览' },
+        xAxis: {
+            categories: {{ dates|safe }},   // x 轴分类
+            tickmarkPlacement: 'on',
+            title: { text: '上周阅读量详情'},
+        },
+        yAxis: {
+            title: { text: '突发事件新闻阅读量数' },  // y 轴标题
+            {# labels:{ enabled: false }, #}
+            gridLineDashStyle: 'Dash',
+        },
+        series: [{                              // 数据列
+            name: '阅读量',                     // 数据列名
+            data: {{ read_nums }},             // 数据
+            marker: {
+                fillColor: '#ef4339',
+                radius: 5
+            }
+        }],
+        plotOptions: {
+            line: {
+                dataLabels: {
+                    enabled: true
+                }
+            }
+        },
+        legend: { enabled: false },
+        credits: { enabled: false },
+    };
+
+
+    var options_area_accident = {
+        chart: { type: 'line' }, //指定图表的类型，默认是折线图（line）
+        title: { text: '不同地区突发事件新闻概览' },
+        xAxis: {
+            categories: { text:'辽宁,安徽,江苏'},
+            tickmarkPlacement: 'on',
+            title: { text: '地区名'},
+        },
+        yAxis: {
+            title: { text: '事故灾难方面' },  // y 轴标题
+            {# labels:{ enabled: false }, #}
+            gridLineDashStyle: 'Dash',
+        },
+        series: [{                              // 数据列
+            name: '阅读量',                     // 数据列名
+            data: {{ read_nums }},             // 数据
+            marker: {
+                fillColor: '#f54291',
+                radius: 5
+            }
+        }],
+        plotOptions: {
+            line: {
+                dataLabels: {
+                    enabled: true
+                }
+            }
+        },
+        legend: { enabled: false },
+        credits: { enabled: false },
+    };
+
+    var options_area_publicHealth = {
+        chart: { type: 'line' }, //指定图表的类型，默认是折线图（line）
+        title: { text: '不同地区突发事件新闻概览' },
+        xAxis: {
+            categories: { text:'辽宁,安徽,江苏'},
+            tickmarkPlacement: 'on',
+            title: { text: '地区名'},
+        },
+        yAxis: {
+            title: { text: '公共卫生方面' },  // y 轴标题
+            {# labels:{ enabled: false }, #}
+            gridLineDashStyle: 'light',
+        },
+        series: [{                              // 数据列
+            name: '阅读量',                     // 数据列名
+            data: {{ read_nums }},             // 数据
+            marker: {
+                fillColor: '#fff8cd',
+                radius: 5
+            }
+        }],
+        plotOptions: {
+            line: {
+                dataLabels: {
+                    enabled: true
+                }
+            }
+        },
+        legend: { enabled: false },
+        credits: { enabled: false },
+    };
+
+
+
+
+    // 指定图表的配置项和数据
+    var option = {
+         tooltip : {
+            trigger: 'axis',
+            axisPointer : {            // 坐标轴指示器，坐标轴触发有效
+                type : 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
+            }
+        },
+        grid: {
+            left: '3%',
+            right: '4%',
+            bottom: '3%',
+            containLabel: true
+        },
+        title: {
+            text: '不同类别突发事件发生次数统计'
+        },
+
+        legend: {
+            data:['发生次数']
+        },
+        xAxis: {
+
+            data: ["社会安全","事故灾难","公共卫生","自然灾害"],
+            tickmarkPlacement: 'on',
+        },
+        yAxis: {
+           splitLine: {show: true},//去除网格线
+        },
+        series: [{
+            name: '数量',
+            type: 'bar',
+            data: [5, 20, 36, 10],
+            marker: {
+                fillColor: '#f54291',
+                radius: 5
+            }
+        }]
+    };
+
+
+    // 图表初始化函数
+
+    var myChart = Highcharts.chart('main', option);
+
+    var chart = Highcharts.chart('container', options);
+      console.log({{ read_nums }})
+
+    var chart = Highcharts.chart('container_accident', options_area_accident);
+
+
+    var chart = Highcharts.chart('container_publicHealth', options_area_publicHealth);
+
+</script>
+
+
+{% endblock %}

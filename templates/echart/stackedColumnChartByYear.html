@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+
+{% block title %}
+    中国突发事件跟踪与监管系统
+{% endblock %}
+
+{% block header_extends %}
+
+
+<!--   <script src="static/echart/echarts.min.js"></script>-->
+  <script src="https://cdn.bootcss.com/echarts/4.1.0.rc2/echarts.min.js"></script>
+  <script type="text/javascript" src="http://echarts.baidu.com/gallery/vendors/echarts/map/js/china.js"></script>
+{% endblock %}
+
+{% block nav_home_active %}active{% endblock %}
+
+{% block content %}
+<!-- 定义放置文章标题的div容器 -->
+<div class="container">
+    <div class="row">
+        <div class="col-md-3">
+
+            <div class="list-group">
+              <a href="{% url 'dashboard' %}" class="list-group-item">
+                中国省份统计一览
+              </a>
+                <a href="{% url 'pieChart' %}" class="list-group-item">不同类型突发事件统计</a>
+                <a href="{% url 'stackedColumnChart' %}" class="list-group-item">一周每个类别每天的次数</a>
+                <a href="{% url 'histogramChart' %}" class="list-group-item">上个月突发事件次数</a>
+                <a href="{% url 'stackedColumnChartByYear' %}" class="list-group-item active">每年突发事件次数</a>
+
+            </div>
+        </div>
+
+        <div class="col-md-9">
+          <div class="container">
+
+             <h3 class="home-content" align="center"> 每年突发事件发生次数 </h3>
+
+            <div class="home-content" align="center">
+            <!-- 图表容器 DOM  柱状图展示每个类别对应每年的变化-->
+                <div id="histogramChartByYear" style="width: 800px;height:500px;"></div>
+
+
+          </div>
+    </div>
+        </div>
+    </div>
+</div>
+
+<script>
+
+ // 基于准备好的dom，初始化echarts实例 柱状图
+    var histogramChartByYear = echarts.init(document.getElementById('histogramChartByYear'));
+
+    // 指定图表的配置项和数据
+    var option = {
+        legend: {},
+        tooltip: {},
+        dataset: {
+            // 提供一份数据。
+            source: [
+                ['product', '2017','2018','2019', '2020'],
+                ['自然灾害',  {{nature_num_2017}}, {{nature_num_2018}}, {{nature_num_2019}},{{nature_num_2020}} ],
+                ['公共卫生',  {{publicHealth_num_2016}},{{publicHealth_num_2017}},{{publicHealth_num_2018}}, {{publicHealth_num_2019}}],
+                ['事故灾难',  {{accident_num_2016}}, {{accident_num_2017}}, {{accident_num_2018}}, {{accident_num_2019}}],
+                ['社会安全', {{socialSecurity_num_2016}}, {{socialSecurity_num_2017}},{{socialSecurity_num_2018}},{{socialSecurity_num_2019}}]
+            ]
+        },
+            // 声明一个 X 轴，类目轴（category）。默认情况下，类目轴对应到 dataset 第一列。
+            xAxis: {type: 'category'},
+            // 声明一个 Y 轴，数值轴。
+            yAxis: {},
+            // 声明多个 bar 系列，默认情况下，每个系列会自动对应到 dataset 的每一列。
+            series: [
+                {type: 'bar'},
+                {type: 'bar'},
+                {type: 'bar'},
+                {type: 'bar'},
+
+        ]
+    };
+
+    // 使用刚指定的配置项和数据显示图表。
+    histogramChartByYear.setOption(option);
+
+</script>
+
+{% endblock %}

@@ -1,0 +1,153 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+
+{% block title %}
+    中国突发事件跟踪与监管系统
+{% endblock %}
+
+{% block header_extends %}
+  <script src="http://cdn.bootcss.com/echarts/3.2.2/echarts.min.js"></script>
+  <script type="text/javascript" src="C:\Users\dell\Desktop\xxc\xxc\code\trackman\china.js"></script>
+  <style>
+          *{margin:0;padding:0}
+          html,body{
+              width:100%;
+              height:100%;
+          }
+          #main{
+                width:800px;;
+                height:600px;
+                margin: 40px auto;
+                border:1px solid #ddd;
+
+          /*默认长宽比0.75*/
+      </style>
+{% endblock %}
+
+{% block nav_home_active %}active{% endblock %}
+
+{% block content %}
+
+<!-- 定义放置文章标题的div容器 -->
+<div class="container">
+    <div class="row">
+        <div class="col-md-3">
+
+            <div class="list-group">
+                <a href="{% url 'dashboard' %}" class="list-group-item active">
+                    中国省份统计一览
+                </a>
+                <a href="{% url 'pieChart' %}" class="list-group-item">不同类型突发事件统计</a>
+                <a href="{% url 'stackedColumnChart' %}" class="list-group-item">一周每个类别每天的次数</a>
+                <a href="{% url 'histogramChart' %}" class="list-group-item">上个月突发事件次数</a>
+                <a href="{% url 'stackedColumnChartByYear' %}" class="list-group-item">每年突发事件次数</a>
+
+            </div>
+        </div>
+
+        <div class="col-md-9">
+            <div class="container">
+                <h3 class="home-content" align="center"> Emergency Tracking data dashboard 一览 </h3>
+                 <div id="main"></div>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+<script type="text/javascript">
+
+        let dataList=[
+            {name:"南海诸岛",value:0},
+            {name: '北京', value:419 },
+            {name: '天津', value: 36},
+            {name: '上海', value: 100 },
+            {name: '重庆', value: 115 },
+            {name: '河北', value: 237 },
+            {name: '河南', value: 217 },
+            {name: '云南', value: 211 },
+            {name: '辽宁', value: 127 },
+            {name: '黑龙江', value: 113 },
+            {name: '湖南', value: 206 },
+            {name: '安徽', value: 227 },
+            {name: '山东', value: 297 },
+            {name: '新疆', value: 72 },
+            {name: '江苏', value: 339 },
+            {name: '浙江', value: 221 },
+            {name: '江西', value: 204 },
+            {name: '湖北', value: 207 },
+            {name: '广西', value: 257 },
+            {name: '甘肃', value: 79 },
+            {name: '山西', value: 86},
+            {name: '内蒙古', value:63},
+            {name: '陕西', value: 260},
+            {name: '吉林', value: 72},
+            {name: '福建', value: 207},
+            {name: '贵州', value: 121},
+            {name: '广东', value: 368},
+            {name: '青海', value: 33},
+            {name: '西藏', value: 24},
+            {name: '四川', value: 537},
+            {name: '宁夏', value: 30},
+            {name: '海南', value: 54},
+            {name: '台湾', value: 85},
+            {name: '香港', value: 19},
+            {name: '澳门', value: 4}
+        ]
+
+
+
+
+var optionMap = {
+                backgroundColor: '#FFFFFF',
+                title: {
+                    text: '全国各省份突发事件统计大数据',
+                    subtext: '',
+                    x:'center'
+                },
+                tooltip : {
+                    trigger: 'item'
+                },
+
+                //左侧小导航图标
+                visualMap: {
+                    show : true,
+                    x: 'left',
+                    y: 'center',
+                    splitList: [
+                        {start: 500, end:600},{start: 400, end: 500},
+                        {start: 300, end: 400},{start: 200, end: 300},
+                        {start: 100, end: 200},{start: 0, end: 100},
+                    ],
+                    color: ['#5475f5', '#9feaa5', '#85daef','#74e2ca', '#e6ac53', '#9fb5ea']
+                },
+
+                //配置属性
+                series: [{
+                    name: '地区 : 突发事件发生次数',
+                    type: 'map',
+                    mapType: 'china',
+                    roam: true,
+                    label: {
+                        normal: {
+                            show: true  //省份名称
+                        },
+                        emphasis: {
+                            show: false
+                        }
+                    },
+                    data:dataList  //数据
+                }]
+            };
+        //初始化echarts实例
+        var myChart = echarts.init(document.getElementById('main'));
+
+        //使用制定的配置项和数据显示图表
+        myChart.setOption(optionMap);
+
+
+</script>
+
+
+{% endblock %}

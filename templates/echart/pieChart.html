@@ -1,0 +1,212 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+
+{% block title %}
+    中国突发事件跟踪与监管系统
+{% endblock %}
+
+{% block header_extends %}
+
+
+<!--   <script src="static/echart/echarts.min.js"></script>-->
+  <script src="https://cdn.bootcss.com/echarts/4.1.0.rc2/echarts.min.js"></script>
+  <script type="text/javascript" src="http://echarts.baidu.com/gallery/vendors/echarts/map/js/china.js"></script>
+{% endblock %}
+
+{% block nav_home_active %}active{% endblock %}
+
+{% block content %}
+<!-- 定义放置文章标题的div容器 -->
+<div class="container">
+    <div class="row">
+        <div class="col-md-3">
+
+            <div class="list-group">
+              <a href="{% url 'dashboard' %}" class="list-group-item">
+                中国省份统计一览
+              </a>
+                <a href="{% url 'pieChart' %}" class="list-group-item active">不同类型突发事件统计</a>
+                <a href="{% url 'stackedColumnChart' %}" class="list-group-item">一周每个类别每天的次数</a>
+                <a href="{% url 'histogramChart' %}" class="list-group-item">上个月突发事件次数</a>
+                <a href="{% url 'stackedColumnChartByYear' %}" class="list-group-item">每年突发事件次数</a>
+
+            </div>
+        </div>
+
+        <div class="col-md-9">
+          <div class="container">
+
+<!--        为了方便理解 打印给dear 看 过后删-->
+<!--        -&#45;&#45;&#45;&#45; 突发事件新闻总数： {{ total_nums}}-->
+<!--        -&#45;&#45;&#45;&#45; 自然灾害 数量 : {{nature_num}}-->
+<!--        -&#45;&#45;&#45;&#45;公共卫生 数量:  {{publicHealth_num}}-->
+<!--        -&#45;&#45;&#45;&#45;事故灾难 数量:  {{accident_num}}-->
+<!--        -&#45;&#45;&#45;&#45;社会安全 数量:  {{socialSecurity_num}}-->
+
+
+         <h3 class="home-content" align="center"> 不同类型突发事件统计图表一览 </h3>
+
+          <div class="home-content" align="center">
+
+            <!-- 图表容器 DOM -->
+                <div id="PieChart" style="width: 800px;height:500px;"></div>
+
+          </div>
+    </div>
+        </div>
+    </div>
+</div>
+
+<script>
+
+        var pieChart = echarts.init(document.getElementById('PieChart'));
+        option = {
+            title : {
+                text: '中国应急服务网提供信息来源',       //大标题
+                subtext: '爬虫获取',                //类似于副标题
+                x:'center'                 //标题位置   居中
+            },
+            tooltip : {
+                trigger: 'item',           //数据项图形触发，主要在散点图，饼图等无类目轴的图表中使用。
+                formatter: "{a} <br/>{b} : {c} ({d}%)"   //{a}（系列名称），{b}（数据项名称），{c}（数值）, {d}（百分比）用于鼠标悬浮时对应的显示格式和内容
+            },
+            legend: {                           //图例组件。
+                orient: 'vertical',             //图例列表的布局朝向
+                left: 'left',
+                data: ['自然危害','社会安全','公共卫生','事故灾难','应急预警']
+            },
+            series : [              //系列列表。每个系列通过 type 决定自己的图表类型
+                {
+                    name: '不同类型突发事件占据比例',
+                    type: 'pie',
+                    radius : '55%',
+                    center: ['50%', '60%'],
+                    data:[
+                        {value:{{nature_num}}, name:'自然危害'},
+                        {value:{{socialSecurity_num}}, name:'社会安全'},
+                        {value:{{publicHealth_num}}, name:'公共卫生'},
+                        {value:{{accident_num}}, name:'事故灾难'},
+                        {value:{{emergency_num}}, name:'应急预警'},
+
+                    ],
+                    itemStyle: {
+                        emphasis: {
+                            shadowBlur: 10,
+                            shadowOffsetX: 0,
+                            shadowColor: 'rgba(0, 0, 0, 0.5)'
+                        }
+                    }
+                }
+            ]
+        };
+        pieChart.setOption(option);
+
+
+
+
+
+     // 基于准备好的dom，初始化echarts实例 柱状图
+        var histogramChart = echarts.init(document.getElementById('histogramChart'));
+
+        // 指定图表的配置项和数据
+        var option = {
+            title: {
+                text: '上周突发事件发生次数统计'
+            },
+            tooltip: {},
+            legend: {
+                data:['数量']
+            },
+            xAxis: {
+                data: ["自然危害","社会安全","公共卫生","事故灾难"],
+                tickmarkPlacement: 'on',
+
+
+            },
+            yAxis: {},
+            series: [{
+                name: '销量',
+                type: 'bar',
+                data: [{{ nature_weekNum }}, {{ nature_weekNum }}, 36, 10, 10, 20],
+                marker: {
+                    fillColor: '#7e0cf5',
+                    radius: 5
+                }
+
+            }]
+        };
+
+        // 使用刚指定的配置项和数据显示图表。
+        histogramChart.setOption(option);
+
+
+
+
+     // 基于准备好的dom，初始化echarts实例 堆叠柱状图
+        var stackedolumnChart = echarts.init(document.getElementById('stackedolumnChart'));
+
+        var option = {
+         title: {
+                text: '上周突发事件发生次数统计'
+            },
+            tooltip : {
+                trigger: 'axis',
+                axisPointer : {            // 坐标轴指示器，坐标轴触发有效
+                    type : 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
+                }
+            },
+            grid: {
+                left: '3%',
+                right: '4%',
+                bottom: '3%',
+                containLabel: true
+            },
+            xAxis : [
+                {
+                    type : 'category',
+                    data : ['周一','周二','周三','周四','周五','周六','周日']
+                }
+            ],
+            yAxis : [
+                {
+                    type : 'value'
+                }
+            ],
+            series : [
+                {
+                    name:'自然危害',
+                    type:'bar',
+                    stack: '广告',
+                    data:[120, 132, 101, 134, 90, 230, 210]
+                },
+                {
+                    name:'社会安全',
+                    type:'bar',
+                    stack: '广告',
+                    data:[220, 182, 191, 234, 290, 330, 310]
+                },
+                {
+                    name:'公共卫生',
+                    type:'bar',
+                    stack: '广告',
+                    data:[150, 232, 201, 154, 190, 330, 410]
+                },
+                {
+                    name:'事故灾难',
+                    type:'bar',
+                    stack: '广告',
+                    data:[150, 232, 201, 154, 190, 330, 410]
+                },
+
+
+            ]
+        };
+
+        // 使用刚指定的配置项和数据显示图表。
+        stackedolumnChart.setOption(option);
+
+
+
+    </script>
+
+{% endblock %}

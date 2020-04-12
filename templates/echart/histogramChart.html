@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+
+{% block title %}
+    中国突发事件跟踪与监管系统
+{% endblock %}
+
+{% block header_extends %}
+
+
+<!--   <script src="static/echart/echarts.min.js"></script>-->
+  <script src="https://cdn.bootcss.com/echarts/4.1.0.rc2/echarts.min.js"></script>
+  <script type="text/javascript" src="http://echarts.baidu.com/gallery/vendors/echarts/map/js/china.js"></script>
+{% endblock %}
+
+{% block nav_home_active %}active{% endblock %}
+
+{% block content %}
+<!-- 定义放置echart的div容器 -->
+<div class="container">
+    <div class="row">
+        <div class="col-md-3">
+
+            <div class="list-group">
+              <a href="{% url 'dashboard' %}" class="list-group-item">
+                中国省份统计一览
+              </a>
+                <a href="{% url 'pieChart' %}" class="list-group-item">不同类型突发事件统计</a>
+                <a href="{% url 'stackedColumnChart' %}" class="list-group-item">一周每个类别每天的次数</a>
+                <a href="{% url 'histogramChart' %}" class="list-group-item active">上个月突发事件次数</a>
+                <a href="{% url 'stackedColumnChartByYear' %}" class="list-group-item">每年突发事件次数</a>
+            </div>
+        </div>
+
+        <div class="col-md-9">
+          <div class="container">
+
+             <h3 class="home-content" align="center"> 统计上个月突发事件发生次数 </h3>
+
+            <div class="home-content" align="center">
+            <!-- 图表容器 DOM  柱状图展示每个类别对应每年的变化-->
+                <div id="histogramChart" style="width: 800px;height:500px;"></div>
+<!--                province_ln &ndash;&gt;{{province_ln}}-->
+<!--               province_ln_num &ndash;&gt; {{province_ln_num }}-->
+
+          </div>
+    </div>
+        </div>
+    </div>
+</div>
+
+<script>
+
+     // 基于准备好的dom，初始化echarts实例 柱状图
+        var histogramChart = echarts.init(document.getElementById('histogramChart'));
+
+        // 指定图表的配置项和数据
+        var option = {
+            title: {
+                text: '上周突发事件发生次数统计'
+            },
+            tooltip: {},
+            legend: {
+                data:['数量']
+            },
+            xAxis: {
+                data: ["自然危害","社会安全","公共卫生","事故灾难"],
+                tickmarkPlacement: 'on',
+
+
+            },
+            yAxis: {},
+            series: [{
+                name: '数量',
+                type: 'bar',
+
+                data: [ {{nature_weekNum}},{{publicHealth_weekNum}}, {{accident_weekNum }}, {{socialSecurity_weekNum}}],
+                marker: {
+
+                    fillColor: '#f6c3e5',
+                    radius: 5
+                }
+
+            }]
+        };
+
+        // 使用刚指定的配置项和数据显示图表。
+        histogramChart.setOption(option);
+
+    </script>
+
+{% endblock %}
